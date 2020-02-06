@@ -26,18 +26,19 @@ body {
 
 .table {
   border: solid 2px #111;
-}
-.table div {
-  display: flex;
-  align-items: center;
-  padding: 5px;
 
-  border: solid 1px #ccc;
-  border-top: none;
-  border-left: none;
-}
-.table .head {
-  font-weight: bold;
+  div {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+
+    border: solid 1px #ccc;
+    border-top: none;
+    border-left: none;
+  }
+  .head {
+    font-weight: bold;
+  }
 }
 
 .title {
