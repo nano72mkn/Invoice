@@ -5,4 +5,9 @@
     box-shadow: none;
     padding: 0;
   }
+
+  .delete-btn,
+  .detail-add {
+    display: none !important;
+  }
 }

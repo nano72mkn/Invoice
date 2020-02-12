@@ -2,17 +2,41 @@ import React from 'react'
 import {render} from 'react-dom'
 import ContentEditable from 'react-contenteditable'
 
-import './scss/style.scss'
+import DetailRow from './components/detailRow'
 
-class App extends React.Component {
+import './scss/style.scss'
+import './scss/print.scss'
+
+class App extends React.Component
+{
   constructor() {
     super()
     this.state = {
       "to-company": "丸々御中",
-      "to-name": "相手の名前"
+      "to-name": "相手の名前",
+      date: "2020/1/1",
+      transfer: "振込先",
+      zipcode: "〒000-0000",
+      address: "アドレス",
+      tel: "080-0000-0000",
+      "from-name": "お届け名",
+      deadline: "2020/1/1",
+      subtotal: 0,
+      tax: 0,
+      total: 0,
+      detail_row: [],
+      total_data: [],
+      remarks: ""
     }
 
     this.handleChange = this.handleChange.bind(this)
+    this.displayedPrice = this.displayedPrice.bind(this)
+    this.rowAdd = this.rowAdd.bind(this)
+    this.rowDelete = this.rowDelete.bind(this)
+    this.addTotalData = this.addTotalData.bind(this)
+    this.sum = this.sum.bind(this)
+    this.save = this.save.bind(this)
+    this.load = this.load.bind(this)
   }
 
   componentDidMount() {
@@ -23,8 +47,59 @@ class App extends React.Component {
     this.setState({ [e.currentTarget.className]: e.target.value })
   }
 
+  displayedPrice(price) {
+    return `${price.toLocaleString()}円`
+  }
+
+  rowAdd() {
+    let detail_row = this.state.detail_row
+    detail_row.push(<DetailRow key={detail_row.length} index={detail_row.length} rowDelete={this.rowDelete} addTotalData={this.addTotalData}/>)
+
+    this.setState({ detail_row })
+  }
+
+  rowDelete(index) {
+    let detail_row = this.state.detail_row
+    detail_row[index] = null;
+
+    let total_data = this.state.total_data
+    total_data[index] = 0
+
+    this.setState({ detail_row, total_data })
+  }
+
+  addTotalData(index, total) {
+    let total_data = this.state.total_data
+    total_data[index] = total
+
+    this.setState({ total_data }, this.sum);
+  }
+
+  sum() {
+    const subtotal = this.state.total_data.reduce((prev, current, i, arr) => {
+        return prev+current;
+    })
+
+    const tax = 10
+    const total = subtotal + tax
+
+    this.setState({ subtotal, tax, total })
+  }
+
   render () {
+    const {
+      date,
+      zipcode,
+      address,
+      tel,
+      subtotal,
+      tax,
+      total,
+      detail_row,
+    } = this.state
+
     return (
+      <>
       <div className="page">
         <div className="title">請求書</div>
 
@@ -35,13 +110,23 @@ class App extends React.Component {
                          html={this.state["to-name"]}
                          onChange={this.handleChange}/>
 
-        <div className="date" contenteditable="true">2010/10/10</div>
+        <ContentEditable className="date"
+                         html={date}
+                         onChange={this.handleChange}/>
 
         <div className="from">
-          <div className="zipcode" contenteditable="true">〒000-0000</div>
-          <div className="address" contenteditable="true">丸々県丸々市丸々1-1-1</div>
-          <div className="tel" contenteditable="true">000-0000-0000</div>
-          <div className="from" contenteditable="true">自分の名前</div>
+          <ContentEditable className="zipcode"
+                           html={zipcode}
+                           onChange={this.handleChange}/>
+          <ContentEditable className="address"
+                           html={address}
+                           onChange={this.handleChange}/>
+          <ContentEditable className="tel"
+                           html={tel}
+                           onChange={this.handleChange}/>
+          <ContentEditable className="from-name"
+                           html={this.state["from-name"]}
+                           onChange={this.handleChange}/>
         </div>
 
         <div className="text">下記のとおりご請求申し上げます。</div>
@@ -50,16 +135,20 @@ class App extends React.Component {
           <div className="head">小計</div>
           <div className="head">消費税</div>
           <div className="head">合計</div>
-          <div>4,000円</div>
-          <div>300円</div>
-          <div>4,300円</div>
+          <div>{ this.displayedPrice(subtotal) }</div>
+          <div>{ this.displayedPrice(tax) }</div>
+          <div>{ this.displayedPrice(total) }</div>
         </div>
 
         <div className="transfer-table table">
           <div className="head">振込期日</div>
-          <div contenteditable="true">2020年10月10日</div>
+          <ContentEditable className="deadline"
+                           html={this.state["deadline"]}
+                           onChange={this.handleChange}/>
           <div className="head">振込先</div>
-          <div contenteditable="true">ここそこ</div>
+          <ContentEditable className="transfer"
+                           html={this.state["transfer"]}
+                           onChange={this.handleChange}/>
         </div>
 
         <div className="detail-table table">
@@ -68,19 +157,16 @@ class App extends React.Component {
           <div className="head">単価</div>
           <div className="head">金額</div>
 
-          <div contenteditable="true">詳細が入ります</div>
-          <div contenteditable="true">1</div>
-          <div contenteditable="true">1,000円</div>
-          <div contenteditable="true">1,000円</div>
-
-          <div contenteditable="true">詳細が入ります</div>
-          <div contenteditable="true">1</div>
-          <div contenteditable="true">1,000円</div>
-          <div contenteditable="true">1,000円</div>
+          { detail_row.map((v) => v) }
         </div>
 
-        <div className="remarks" contenteditable="true" />
+        <div>備考</div>
+        <ContentEditable className="remarks"
+                         html={this.state["remarks"]}
+                         onChange={this.handleChange}/>
       </div>
+      <div className="detail-add" onClick={this.rowAdd}>追加</div>
+      </>
     )
   }
 }
