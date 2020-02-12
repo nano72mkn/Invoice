@@ -78,7 +78,7 @@ class App extends React.Component
         return prev+current;
     })
 
-    const tax = subtotal * 0.08
+    const tax = Math.round(subtotal * 0.08)
     const total = subtotal + tax
 
     this.setState({ subtotal, tax, total })
