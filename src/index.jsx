@@ -35,8 +35,6 @@ class App extends React.Component
     this.rowDelete = this.rowDelete.bind(this)
     this.addTotalData = this.addTotalData.bind(this)
     this.sum = this.sum.bind(this)
-    this.save = this.save.bind(this)
-    this.load = this.load.bind(this)
   }
 
   componentDidMount() {
